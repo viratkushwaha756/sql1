@@ -1,0 +1,394 @@
+
+
+.........................................................................
+
+assignment 4
+
+CREATE TABLE stud_275 (
+    roll_no INT,
+    attendance INT,
+    status VARCHAR(10)
+);
+
+insert into stud_275(roll_no, attendance) values(1, 76);
+insert into stud_275(roll_no, attendance) values(2,73);
+insert into stud_275(roll_no, attendance) values(3, 86);
+insert into stud_275(roll_no, attendance) values(4,93);
+
+
+set serveroutput on
+
+ DECLARE  
+       v_roll NUMBER;  
+        v_attendance NUMBER;  
+        v_status VARCHAR(5);  
+    BEGIN  
+           v_roll := &roll;  
+    
+          SELECT Att, Status INTO v_attendance, v_status  
+        FROM Stud  
+       WHERE Roll = v_roll;  
+   
+          IF v_attendance < 75 THEN  
+          DBMS_OUTPUT.PUT_LINE('Term not granted');  
+          UPDATE Stud  
+          SET Status = 'D'  
+         WHERE Roll = v_roll;  
+       ELSE  
+          DBMS_OUTPUT.PUT_LINE('Term granted');  
+            UPDATE Stud  
+          SET Status = 'ND'  
+          WHERE Roll = v_roll;  
+      END IF;  
+   
+   EXCEPTION  
+       WHEN NO_DATA_FOUND THEN  
+           DBMS_OUTPUT.PUT_LINE('Roll number not found');  
+       WHEN OTHERS THEN  
+           DBMS_OUTPUT.PUT_LINE('An error occurred');  
+   END;  
+   / 
+
+
+
+2. Second PL/SQL Block
+
+CREATE TABLE acc_mstr275 (
+       account_no INT,
+       balance INT
+);
+
+INSERT INTO acc_mstr275 values(275, 35000);
+INSERT INTO acc_mstr275 values(267, 15000);
+INSERT INTO acc_mstr275 values(270, 50000);
+
+DECLARE
+    insufficient_funds EXCEPTION;
+    
+    mbal INT;
+    macc_no INT := &account_no;
+    mamt INT := &withdrawal_amount;
+
+BEGIN
+    SELECT balance INTO mbal
+    FROM acc_mstr275
+    WHERE account_no = macc_no;
+
+    IF mamt > mbal THEN
+        RAISE insufficient_funds;
+    ELSE
+        UPDATE acc_mstr275
+        SET balance = balance - mamt
+        WHERE account_no = macc_no;
+        DBMS_OUTPUT.PUT_LINE('Withdrawal successful.');
+    END IF;
+
+EXCEPTION
+    WHEN insufficient_funds THEN
+        DBMS_OUTPUT.PUT_LINE('Insufficient funds to complete withdrawal.');
+END;
+/
+
+
+
+.....................................................
+ 
+
+
+
+            assignment -5
+
+
+
+CREATE TABLE Borrrower275 (
+    Roll_no INT Primary Key,
+    Name VARCHAR(20),
+    DateofIssue DATE,
+    NameofBook VARCHAR(20),
+    Status VARCHAR(1)
+);
+
+CREATE TABLE Fine275 ( 
+    Roll_no INT,
+    Datte DATE,
+    Amt NUMBER,
+    FOREIGN KEY (Roll_no) REFERENCES Borrrower275(Roll_no)
+      ON DELETE CASCADE
+);
+
+
+
+INSERT ALL
+    INTO borrower275  VALUES (1101, 'Vedant Patil', TO_DATE('01-feb-2024', 'DD-mon-YYYY'), 'Percy Jackson Part-1', 'I')
+    INTO borrower275 VALUES (1103, 'Mahesh Dhule', TO_DATE('23-jan-2024', 'DD-mon-YYYY'), 'Harry Potter', 'I')
+    INTO borrower275  VALUES (1102, 'Aisha Sharma', TO_DATE('15-feb-2024', 'DD-mon-YYYY'), 'The Da Vinci Code', 'I')
+    INTO borrower275  VALUES (1104, 'Raj Kapoor', TO_DATE('10-jan-2024', 'DD-mon-YYYY'), 'To Kill a Mockingbird', 'I')
+    INTO borrower275  VALUES (1105, 'Priya Singh', TO_DATE('05-feb-2024', 'DD-mon-YYYY'), 'The Great Gatsby', 'I') 
+    INTO borrower275   VALUES (1106, 'Aniket Deshmukh', TO_DATE('20-jan-2024', 'DD-mon-YYYY'), 'The Catcher in the Rye', 'I')
+    INTO borrower275  VALUES (1107, 'Neha Patel', TO_DATE('28-jan-2024', 'DD-mon-YYYY'), 'The Hunger Games', 'I')
+SELECT * FROM dual;
+
+
+
+
+
+
+
+SET SERVEROUTPUT ON;
+
+CREATE OR REPLACE PROCEDURE libmgt_275 (mroll IN NUMBER, bname IN VARCHAR2, stat IN CHAR)
+IS
+   no_of_days INT;
+   date_of_issue DATE;
+   amt NUMBER;
+   already_returned EXCEPTION;
+BEGIN
+   IF (stat = 'I') THEN
+      SELECT dateofissue INTO date_of_issue 
+      FROM borrower275
+      WHERE roll_no = mroll AND nameofbook = bname;
+      
+      no_of_days := SYSDATE - date_of_issue;
+      
+      IF (no_of_days > 15 AND no_of_days < 30) THEN
+         amt := (no_of_days - 15) * 5;
+      ELSIF (no_of_days > 30) THEN
+         amt := 15 * 5 + (no_of_days - 30) * 50;
+      ELSE
+         amt := 0;
+      END IF;
+      
+      IF (amt > 0) THEN
+         INSERT INTO fine80 VALUES (mroll, SYSDATE, amt);
+      ELSE
+         DBMS_OUTPUT.PUT_LINE('No Fine imposed');
+      END IF;
+      
+      UPDATE borrower275 
+      SET status = 'R' 
+      WHERE roll_no = mroll;
+   ELSE
+      RAISE already_returned;
+   END IF;
+EXCEPTION
+   WHEN NO_DATA_FOUND THEN
+      DBMS_OUTPUT.PUT_LINE('No book issue under mentioned Roll Number');
+   WHEN already_returned THEN
+      DBMS_OUTPUT.PUT_LINE('Already Returned');
+END;
+/
+
+
+
+
+q. 2........................................5......................................
+
+CREATE TABLE acc_dets 
+(
+    accNo NUMBER PRIMARY KEY,
+    br_name VARCHAR2(15),
+    status VARCHAR2(10)
+);
+
+
+ 
+
+SQL> INSERT ALL
+  2    INTO acc_dets VALUES (1, 'BranchA', 1000, 'Active')
+  3    INTO acc_dets VALUES (2, 'BranchB', 1500, 'Active')
+  4    INTO acc_dets VALUES (3, 'BranchC', 2000, 'Inactive')
+  5    INTO acc_dets VALUES (4, 'BranchD', 1200, 'Active')
+  6    INTO acc_dets VALUES (5, 'BranchE', 1800, 'Inactive')
+  7    INTO acc_dets VALUES (6, 'BranchF', 2200, 'Active')
+  8    INTO acc_dets VALUES (7, 'BranchG', 1300, 'Inactive')
+  9    INTO acc_dets VALUES (8, 'BranchH', 1700, 'Inactive')
+ 10  SELECT * FROM dual;
+
+
+CREATE TABLE active_acc_dets (
+    accNo NUMBER,
+    br_name VARCHAR2(15),
+    FOREIGN KEY (accNo) REFERENCES accDetails2(accNo)
+      ON DELETE CASCADE
+);
+
+INSERT ALL
+    INTO active_acc_dets VALUES (1, 'BranchA', 1000)
+    INTO active_acc_dets VALUES (2, 'BranchB', 1500)
+    INTO active_acc_dets VALUES (4, 'BranchD', 1200)
+    INTO active_acc_dets VALUES (6, 'BranchF', 2200)
+SELECT * FROM dual;
+
+Function declaration:
+
+CREATE OR REPLACE FUNCTION active_acc_check(account_no IN NUMBER, bname IN VARCHAR2)
+RETURN NUMBER IS
+    amt NUMBER;
+BEGIN
+    SELECT amount INTO amt FROM acc_dets WHERE acc_no = account_no AND branch = bname AND status = 'Active';
+    
+    IF SQL%FOUND THEN
+        INSERT INTO active_acc_dets VALUES (account_no, bname, amt);
+        RETURN 1;
+    ELSE
+        RETURN 0;
+    END IF;
+EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+        RETURN 0;
+END;
+/
+
+PL/SQL BLOCK
+
+SET SERVEROUTPUT ON;
+
+DECLARE
+    account_no NUMBER;
+    bname VARCHAR2(25);
+    stat VARCHAR2(10);
+    chck NUMBER;
+BEGIN
+    account_no := &account_no;
+    bname := '&enter_branch_name';
+    
+    BEGIN
+        SELECT status INTO stat FROM acc_dets WHERE acc_no = account_no AND branch = bname;
+        
+        IF stat = 'Active' THEN
+            chck := active_acc_check(account_no, bname);
+            
+            IF chck = 1 THEN
+                DBMS_OUTPUT.PUT_LINE('Account is Active');
+            ELSE
+                DBMS_OUTPUT.PUT_LINE('Error: Account details not found or inactive');
+            END IF;
+        ELSE
+            DBMS_OUTPUT.PUT_LINE('Account is Inactive');
+        END IF;
+        
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            DBMS_OUTPUT.PUT_LINE('Error: No record found for the specified account number and branch');
+    END;
+END;
+/
+
+
+
+...........................ASSIGNMENT-6................................
+
+
+
+INSERT ALL
+    INTO Acc_Det_B113 (Accno, Name, L_T_Date, Status) VALUES (1, 'John', TO_DATE('2022-01-01', 'YYYY-MM-DD'), 'Active')
+    INTO Acc_Det_B113 (Accno, Name, L_T_Date, Status) VALUES (2, 'Alice', TO_DATE('2022-02-15', 'YYYY-MM-DD'), 'Inactive')
+    INTO Acc_Det_B113 (Accno, Name, L_T_Date, Status) VALUES (3, 'Bob', TO_DATE('2021-12-10', 'YYYY-MM-DD'), 'Active')
+    INTO Acc_Det_B113 (Accno, Name, L_T_Date, Status) VALUES (4, 'Emily', TO_DATE('2022-03-20', 'YYYY-MM-DD'), 'Inactive')
+    INTO Acc_Det_B113 (Accno, Name, L_T_Date, Status) VALUES (5, 'Charlie', TO_DATE('2022-01-05', 'YYYY-MM-DD'), 'Active')
+SELECT 1 FROM DUAL;
+
+
+
+
+
+
+DECLARE   
+UCount NUMBER;   
+NUCount NUMBER;   
+BEGIN   
+UPDATE Acc_Det_B113 SET Status = 'Active' WHERE (SYSDATE - L_T_Date ) > 365;  
+  IF (SQL%FOUND) THEN    UCount := SQL%ROWCOUNT;   
+ DBMS_OUTPUT.PUT_LINE(UCount || ' Accounts updated');   
+ELSIF (SQL%NOTFOUND) THEN   
+ NUCount := SQL%ROWCOUNT;   
+ DBMS_OUTPUT.PUT_LINE(NUCount || ' Accounts not updated');   
+ END IF;   
+END;   
+/  
+
+q.2......................................6.........................................
+
+
+
+
+-- Inserting values into EMP_B113 table using INSERT ALL
+INSERT ALL
+    INTO EMP_B113  VALUES (101, 50000)
+    INTO EMP_B113  VALUES (102, 55000)
+    INTO EMP_B113  VALUES (103, 60000)
+    INTO EMP_B113  VALUES (104, 52000)
+SELECT * FROM DUAL;
+
+CREATE TABLE Incre_sal_B113 (Emp_ID NUMBER REFERENCES   
+EMP_B113(Emp_ID) , Salary NUMBER );
+
+
+
+SET SERVEROUTPUT ON;
+ DECLARE   
+ emp_no number;  
+ esalary number; 
+ New_Sal NUMBER;   
+ Average_sal number; 
+ CURSOR Emp_cursor IS SELECT EMP_ID,Salary FROM EMP_B113;  
+  
+BEGIN   
+ Open Emp_cursor; 
+SELECT avg(Salary) INTO Average_sal FROM EMP_B113;   
+ LOOP   
+ Fetch Emp_cursor into emp_no,esalary; 
+ Exit when Emp_cursor%notfound; 
+IF(esalary < Average_sal) THEN   
+ New_Sal := esalary + (0.1*esalary);   
+ UPDATE EMP_B113 SET Salary = New_Sal where EMP_ID=emp_no;   
+ INSERT INTO Incre_sal_B113 VALUES (emp_no , New_Sal);   
+ END IF;   
+ END LOOP;   
+ Close Emp_cursor; 
+ END;   
+ /   
+
+
+
+
+
+
+..............................assignment-7..........................
+
+CREATE TABLE clientmstr (
+    client_id NUMBER PRIMARY KEY,
+    client_name VARCHAR2(50),
+    client_address VARCHAR2(100),
+    client_phone VARCHAR2(20)
+);
+-- Insert values into clientmstr table
+INSERT ALL
+    INTO clientmstr  VALUES (1, 'John Doe', '123 Main St', '555-1234')
+    INTO clientmstr  VALUES (2, 'Jane Smith', '456 Oak St', '555-5678')
+    INTO clientmstr  VALUES (3, 'Michael Johnson', '789 Elm St', '555-9012')
+SELECT * FROM DUAL;
+
+-- Inserting values into audit_trade table using INSERT ALL
+
+INSERT ALL
+    INTO audit_trade  VALUES ('UPDATE', 1, 'John Doe', '123 Main St', '555-1234', TO_TIMESTAMP('2024-04-20 09:00:00', 'YYYY-MM-DD HH24:MI:SS'))
+    INTO audit_trade  VALUES ('UPDATE', 2, 'Jane Smith', '456 Oak St', '555-5678', TO_TIMESTAMP('2024-04-20 09:15:00', 'YYYY-MM-DD HH24:MI:SS'))
+    INTO audit_trade  VALUES ('DELETE', 3, 'Michael Johnson', '789 Elm St', '555-9012', TO_TIMESTAMP('2024-04-20 09:30:00', 'YYYY-MM-DD HH24:MI:SS'))
+SELECT * FROM DUAL;
+
+CREATE OR REPLACE TRIGGER audit_clientmstr_row_trigger
+AFTER UPDATE OR DELETE ON clientmstr
+FOR EACH ROW
+BEGIN
+    IF UPDATING THEN
+        INSERT INTO audit_trade(action_type, client_id, client_name, client_address, client_phone, action_date)
+        VALUES ('UPDATE', :OLD.client_id, :OLD.client_name, :OLD.client_address, :OLD.client_phone, SYSTIMESTAMP);
+    ELSIF DELETING THEN
+        INSERT INTO audit_trade(action_type, client_id, client_name, client_address, client_phone, action_date)
+        VALUES ('DELETE', :OLD.client_id, :OLD.client_name, :OLD.client_address, :OLD.client_phone, SYSTIMESTAMP);
+    END IF;
+END;
+/
+
+
