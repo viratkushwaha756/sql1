@@ -1,4 +1,5 @@
-Problem statement 1. Consider following Bank database schema and solve given queries:
+Problem statement 1. 
+Consider following Bank database schema and solve given queries:
 Account(Acc_no, branch_name,balance)
 branch(branch_name,branch_city, assets)
 customer(cust_name,cust_street,cust_city)
@@ -114,7 +115,7 @@ VARCHAR(10));
 
 INSERT INTO add_dets values(2,'xyz','Kolhapur','Maharashtra','Kolhapur',410512);
 
- select * from add_dets where code_no IN ( select cust_no from cust_mstr where 
+select * from add_dets where code_no IN ( select cust_no from cust_mstr where 
 fname='Harshad' AND lname='Karale');
  
 b) Create following Tables
