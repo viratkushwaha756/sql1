@@ -1,0 +1,336 @@
+Problem-1 
+1.Create a synonym for the customer table: 
+CREATE SYNONYM cust FOR customer; 
+
+2.Add customer phone number in Customer table: 
+ALTER TABLE customer ADD cust_phone VARCHAR(15); 
+
+3.Delete phone number attribute from Customer table: 
+ALTER TABLE customer DROP COLUMN cust_phone; 
+
+4.Find the names of all branches in loan relation: 
+SELECT DISTINCT branch_name FROM Loan; 
+
+5.Find all customers who have a loan from bank. Find their names, loan_no, and loan amount: 
+SELECT c.cust_name, l.loan_no, l.amount 
+FROM customer c 
+JOIN Borrower b ON c.cust_name = b.cust_name 
+JOIN Loan l ON b.loan_no = l.loan_no;
+
+6.List all customers in alphabetical order who have a loan from Akurdi branch: 
+SELECT c.cust_name 
+FROM customer c 
+JOIN Borrower b ON c.cust_name = b.cust_name 
+JOIN Loan l ON b.loan_no = l.loan_no 
+WHERE l.branch_name = 'Akurdi' 
+ORDER BY c.cust_name; 
+
+7.Find all customers who have an account or loan or both at the bank: 
+SELECT DISTINCT c.cust_name 
+FROM customer c 
+LEFT JOIN Depositor d ON c.cust_name = d.cust_name 
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name 
+WHERE d.cust_name IS NOT NULL OR b.cust_name IS NOT NULL; 
+
+8.Find the average account balance at the Akurdi branch: 
+SELECT AVG(balance) AS avg_balance 
+FROM Account 
+WHERE branch_name = 'Akurdi';
+
+9.Find the number of depositors at each branch: 
+SELECT branch_name, COUNT(*) AS num_depositors 
+FROM Depositor 
+GROUP BY branch_name; 
+
+10.Delete all tuples at every branch located in Nigdi: 
+DELETE FROM branch WHERE branch_city = 'Nigdi'; 
+
+Problem-2 
+-- Create Tables 
+CREATE TABLE cust_mstr ( 
+cust_no INT, 
+fname VARCHAR(50), 
+lname VARCHAR(50) 
+); 
+CREATE TABLE add_dets ( 
+code_no INT, 
+add1 VARCHAR(100), 
+add2 VARCHAR(100), 
+state VARCHAR(50), 
+city VARCHAR(50), 
+pincode VARCHAR(10) 
+); 
+-- Insert data into cust_mstr table 
+INSERT INTO cust_mstr (cust_no, fname, lname) VALUES 
+(1, 'John', 'Doe'), 
+(2, 'Jane', 'Smith'); -- Insert data into add_dets table 
+INSERT INTO add_dets (code_no, add1, add2, state, city, pincode) VALUES 
+(1, '123 Main St', 'Apt 101', 'California', 'Los Angeles', '90001'), 
+(2, '456 Elm St', NULL, 'New York', 'New York City', '10001'
+); -- Retrieve the address of customer Fname as 'John' and Lname as 'Doe' 
+
+SELECT add1, add2, state, city, pincode 
+FROM add_dets 
+WHERE code_no IN ( 
+SELECT code_no 
+FROM cust_mstr 
+WHERE fname = 'John' AND lname = 'Doe' 
+); 
+-- Create View on add_dets table by selecting any two columns 
+
+CREATE VIEW add_dets_view AS 
+SELECT add1, add2 
+FROM add_dets;
+ -- Perform insert, update, delete operations on the view (add_dets_view) -- Insert operation 
+INSERT INTO add_dets_view (add1, add2) VALUES ('789 Pine St', NULL); -- Update operation 
+UPDATE add_dets_view 
+SET add1 = '321 Oak St' 
+WHERE add1 = '456 Elm St';
+ -- Delete operation 
+DELETE FROM add_dets_view WHERE add1 = '123 Main St';
+
+ -- Create Tables 
+CREATE TABLE emp_mstr ( 
+e_mpno INT, 
+f_name VARCHAR(50), 
+l_name VARCHAR(50), 
+m_name VARCHAR(50), 
+dept VARCHAR(50), 
+desg VARCHAR(50), 
+branch_no INT 
+); 
+
+CREATE TABLE branch_mstr ( 
+name VARCHAR(50), 
+b_no INT 
+); 
+-- List the employee details along with branch names to which they belong 
+SELECT e.e_mpno, e.f_name, e.l_name, e.m_name, e.dept, e.desg, b.name AS branch_name 
+FROM emp_mstr e 
+INNER JOIN branch_mstr b ON e.branch_no = b.b_no; 
+
+Problem-3
+ -- Q.1 Create Tables with appropriate constraints and suitable data 
+CREATE TABLE Account ( 
+Acc_no INT PRIMARY KEY, 
+branch_name VARCHAR(50) NOT NULL, 
+balance DECIMAL(10, 2), 
+FOREIGN KEY (branch_name) REFERENCES branch(branch_name) 
+); 
+
+CREATE TABLE branch ( 
+branch_name VARCHAR(50) PRIMARY KEY, 
+branch_city VARCHAR(50), 
+Property DECIMAL(12, 2) -- Modified attribute from 'assets' to 'Property' 
+); 
+
+CREATE TABLE customer ( 
+cust_name VARCHAR(50) PRIMARY KEY, 
+cust_street VARCHAR(100), 
+cust_city VARCHAR(50) 
+); 
+
+CREATE TABLE Depositor ( 
+cust_name VARCHAR(50), 
+acc_no INT, 
+PRIMARY KEY (cust_name, acc_no), 
+FOREIGN KEY (cust_name) REFERENCES customer(cust_name), 
+FOREIGN KEY (acc_no) REFERENCES Account(Acc_no) 
+); 
+
+CREATE TABLE Loan ( 
+loan_no INT PRIMARY KEY, 
+branch_name VARCHAR(50), 
+amount DECIMAL(10, 2), 
+FOREIGN KEY (branch_name) REFERENCES branch(branch_name) 
+); 
+
+CREATE TABLE Borrower ( 
+cust_name VARCHAR(50), 
+loan_no INT, 
+PRIMARY KEY (cust_name, loan_no), 
+FOREIGN KEY (cust_name) REFERENCES customer(cust_name), 
+FOREIGN KEY (loan_no) REFERENCES Loan(loan_no) 
+);
+
+ -- Q.2 Modify "assets" attribute of branch table to "Property" 
+ALTER TABLE branch RENAME COLUMN assets TO Property; 
+
+-- Q.3 Find all loan numbers for loans made at Akurdi Branch with loan amount > 12000. 
+SELECT loan_no 
+FROM Loan 
+WHERE branch_name = 'Akurdi' AND amount > 12000;
+
+-- Q.4 Find all customers who have both account and loan at bank. 
+SELECT DISTINCT c.cust_name 
+FROM customer c 
+INNER JOIN Depositor d ON c.cust_name = d.cust_name 
+INNER JOIN Borrower b ON c.cust_name = b.cust_name;
+
+ -- Q.5 Find all customers who have account but no loan at the bank. 
+SELECT DISTINCT c.cust_name 
+FROM customer c 
+INNER JOIN Depositor d ON c.cust_name = d.cust_name 
+LEFT JOIN Borrower b ON c.cust_name = b.cust_name 
+WHERE b.cust_name IS NULL;
+
+ -- Q.6 Find the average account balance at each branch 
+SELECT branch_name, AVG(balance) AS avg_balance 
+FROM Account 
+GROUP BY branch_name;
+
+
+-- Q.7 Find the branches where average account balance > 12000. 
+SELECT branch_name 
+FROM ( 
+SELECT branch_name, AVG(balance) AS avg_balance 
+FROM Account 
+GROUP BY branch_name 
+) AS avg_balances 
+WHERE avg_balance > 12000;
+
+-- Q.8 Find number of tuples in customer relation. 
+SELECT COUNT(*) AS tuple_count 
+FROM customer; 
+
+-- Q.9 Calculate total loan amount given by bank. 
+SELECT SUM(amount) AS total_loan_amount 
+FROM Loan; 
+
+-- Q.10 Delete all loans with loan amount between 1300 and 1500. 
+DELETE FROM Loan 
+WHERE amount BETWEEN 1300 AND 1500; 
+
+-- Q.11 Create sequence roll_seq and use in student table for roll_no column. 
+CREATE SEQUENCE roll_seq 
+START WITH 1 
+INCREMENT BY 1 
+NOCACHE; 
+
+CREATE TABLE student ( 
+roll_no INT DEFAULT roll_seq.NEXTVAL PRIMARY KEY, 
+name VARCHAR(50), 
+age INT, 
+class VARCHAR(10) 
+); 
+
+Problem-4 
+-- Creating tables 
+CREATE TABLE cust_mstr ( 
+custno NUMBER PRIMARY KEY, 
+fname VARCHAR2(50), 
+lname VARCHAR2(50) 
+); 
+
+CREATE TABLE acc_fd_cust_dets ( 
+codeno NUMBER PRIMARY KEY, 
+acc_fd_no NUMBER, 
+CONSTRAINT fk_acc_fd_no FOREIGN KEY (acc_fd_no) REFERENCES fd_dets(fd_sr_no) 
+); 
+
+CREATE TABLE fd_dets ( 
+fd_sr_no NUMBER PRIMARY KEY, 
+amt NUMBER(10, 2) 
+); 
+
+CREATE TABLE emp_mstr ( 
+emp_no NUMBER PRIMARY KEY, 
+f_name VARCHAR2(50), 
+l_name VARCHAR2(50), 
+m_name VARCHAR2(50), 
+dept VARCHAR2(50) 
+); 
+
+CREATE TABLE cntc_dets ( 
+code_no NUMBER PRIMARY KEY, 
+cntc_type VARCHAR2(50), 
+cntc_data VARCHAR2(100) 
+); 
+
+-- Inserting sample data into cust_mstr 
+INSERT INTO cust_mstr VALUES (1, 'John', 'Doe'); 
+INSERT INTO cust_mstr VALUES (2, 'Jane', 'Smith'); 
+INSERT INTO cust_mstr VALUES (3, 'Alice', 'Johnson'); -- Inserting sample data into fd_dets 
+INSERT INTO fd_dets VALUES (101, 6000.00); 
+INSERT INTO fd_dets VALUES (102, 4500.00); 
+INSERT INTO fd_dets VALUES (103, 7000.00); -- Inserting sample data into acc_fd_cust_dets 
+INSERT INTO acc_fd_cust_dets VALUES (201, 101); 
+INSERT INTO acc_fd_cust_dets VALUES (202, 102); 
+INSERT INTO acc_fd_cust_dets VALUES (203, 103); -- Inserting sample data into emp_mstr 
+INSERT INTO emp_mstr VALUES (1, 'John', 'Doe', 'A', 'IT'); 
+INSERT INTO emp_mstr VALUES (2, 'Jane', 'Smith', 'B', 'HR'); -- Inserting sample data into cntc_dets 
+INSERT INTO cntc_dets VALUES (101, 'Email', 'john.doe@example.com'); 
+INSERT INTO cntc_dets VALUES (102, 'Phone', '123-456-7890'); -- Query to list customers holding fixed deposits of amount more than 5000 
+SELECT c.custno, c.fname, c.lname 
+FROM cust_mstr c 
+JOIN acc_fd_cust_dets acd ON c.custno = acd.codeno 
+JOIN fd_dets fd ON acd.acc_fd_no = fd.fd_sr_no 
+WHERE fd.amt > 5000; -- Creating view 
+CREATE VIEW cust_fd_view AS 
+SELECT cm.fname, acd.acc_fd_no 
+FROM cust_mstr cm 
+JOIN acc_fd_cust_dets acd ON cm.custno = acd.codeno; -- Insert operation 
+INSERT INTO cust_fd_view VALUES ('Bob', 204); -- Update operation 
+UPDATE cust_fd_view SET acc_fd_no = 205 WHERE fname = 'Bob'; -- Delete operation 
+DELETE FROM cust_fd_view WHERE fname = 'Bob'; -- Query using left outer join 
+SELECT e.emp_no, e.f_name, e.l_name, e.m_name, e.dept, c.cntc_type, c.cntc_data 
+FROM emp_mstr e 
+LEFT OUTER JOIN cntc_dets c ON e.emp_no = c.code_no; -- Query using right join 
+SELECT e.emp_no, e.f_name, e.l_name, e.m_name, e.dept, c.cntc_type, c.cntc_data 
+FROM emp_mstr e 
+RIGHT OUTER JOIN cntc_dets c ON e.emp_no = c.code_no; 
+
+Problem-5 
+-- Creating tables for scenario
+ a) 
+CREATE TABLE cust_mstr ( 
+cust_no INT PRIMARY KEY, 
+fname VARCHAR(50), 
+lname VARCHAR(50) 
+); 
+
+CREATE TABLE add_dets ( 
+code_no INT PRIMARY KEY, 
+add1 VARCHAR(100), 
+add2 VARCHAR(100), 
+state VARCHAR(50), 
+city VARCHAR(50), 
+pincode VARCHAR(10) 
+); 
+
+-- Inserting sample data into cust_mstr 
+INSERT INTO cust_mstr VALUES (1, 'John', 'Doe'); 
+INSERT INTO cust_mstr VALUES (2, 'Jane', 'Smith'); 
+INSERT INTO cust_mstr VALUES (3, 'Alice', 'Johnson'); -- Inserting sample data into add_dets 
+INSERT INTO add_dets VALUES (101, '123 Main St', 'Apt 101', 'CA', 'Los Angeles', '90001'); 
+INSERT INTO add_dets VALUES (102, '456 Elm St', 'Apt 202', 'CA', 'San Francisco', '94101'); 
+INSERT INTO add_dets VALUES (103, '789 Oak St', 'Apt 303', 'NY', 'New York', '10001'); -- 1. Retrieve the address of customer Fname as 'xyz' and Lname as 'pqr': 
+SELECT a.add1, a.add2, a.state, a.city, a.pincode 
+FROM cust_mstr c 
+JOIN add_dets a ON c.cust_no = a.code_no 
+WHERE c.fname = 'xyz' AND c.lname = 'pqr'; -- 2. Create a view on add_dets table by selecting any two columns and perform insert, update, 
+delete operations: 
+CREATE VIEW add_dets_view AS 
+SELECT add1, add2 
+FROM add_dets;
+
+ -- Insert operation 
+INSERT INTO add_dets_view VALUES ('789 Pine St', 'Apt 404'); -- Update operation 
+UPDATE add_dets_view SET add2 = 'Apt 505' WHERE add1 = '789 Pine St'; -- Delete operation 
+DELETE FROM add_dets_view WHERE add1 = '789 Pine St'; -- Creating tables for scenario b) 
+CREATE TABLE cust_mstr ( 
+cust_no INT PRIMARY KEY, 
+fname VARCHAR(50), 
+lname VARCHAR(50) 
+); 
+
+CREATE TABLE add_dets ( 
+code_no INT PRIMARY KEY, 
+pincode VARCHAR(10) 
+); 
+
+-- Query to list customers who do not have bank branches in their vicinity: 
+SELECT c.cust_no, c.fname, c.lname 
+FROM cust_mstr c 
+LEFT JOIN add_dets a ON c.cust_no = a.code_no 
+WHERE a.code_no IS NULL;
