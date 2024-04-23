@@ -463,6 +463,59 @@ END;
 
 
 select * from fine;
+/*
+
+
+
+
+SET SERVEROUTPUT ON; 
+ 
+CREATE OR REPLACE PROCEDURE libmgt_80 (mroll IN NUMBER, bname IN VARCHAR2, stat IN CHAR) 
+IS 
+   no_of_days INT; 
+   date_of_issue DATE; 
+   amt NUMBER; 
+   already_returned EXCEPTION; 
+BEGIN 
+   IF (stat = 'I') THEN 
+      SELECT dateofissue INTO date_of_issue  
+      FROM borrower80  
+      WHERE roll_no = mroll AND nameofbook = bname; 
+       
+      no_of_days := SYSDATE - date_of_issue; 
+       
+      IF (no_of_days > 15 AND no_of_days < 30) THEN 
+         amt := (no_of_days - 15) * 5; 
+      ELSIF (no_of_days > 30) THEN 
+         amt := 15 * 5 + (no_of_days - 30) * 50; 
+      ELSE 
+         amt := 0; 
+      END IF; 
+       
+      IF (amt > 0) THEN 
+         INSERT INTO fine80 VALUES (mroll, SYSDATE, amt); 
+      ELSE 
+         DBMS_OUTPUT.PUT_LINE('No Fine imposed'); 
+      END IF; 
+       
+      UPDATE borrower80  
+      SET status = 'R'  
+      WHERE roll_no = mroll; 
+   ELSE 
+      RAISE already_returned; 
+   END IF; 
+EXCEPTION 
+   WHEN NO_DATA_FOUND THEN 
+      DBMS_OUTPUT.PUT_LINE('No book issue under mentioned Roll Number'); 
+   WHEN already_returned THEN 
+      DBMS_OUTPUT.PUT_LINE('Already Returned'); 
+END; 
+/
+*/
+
+
+
+
 
 
 
