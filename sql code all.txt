@@ -321,7 +321,7 @@ in stud
 table as “ND”. 
 CREATE TABLE stud(roll_no NUMBER PRIMARY KEY , att NUMBER ,status char(5)); 
 
-set serveroutput on 
+set serveroutput on;
  
  DECLARE   
        v_roll NUMBER;   
@@ -389,6 +389,9 @@ BR for client_master table specifies when the value of bal_due field is less tha
 the 
 exception.
 
+create table client_master(client_id number(20),input number(10));
+
+set serveroutput on;
 Declare 
 input number(10); 
 client_id number; 
@@ -416,7 +419,15 @@ takes
 place, a record for the same is maintained in the increment_salary table. 
 EMP (E_no , Salary) 
 increment_salary(E_no , Salary) 
-SELECT * FROM salary; 
+
+
+create table emp(emp_no number(10),Salary number(20));
+create table salary(emp_no number(10),salary number(20));
+create table increment_salary(E_no number(10),Salary number(10));
+
+insert into salary values(1,7887);
+insert into salary values(2,78);
+
 
 CURSOR salhigh IS SELECT emp_no,salary FROM salary WHERE salary < (SELECT 
 AVG(salary) FROM salary); 
@@ -442,7 +453,7 @@ PL/SQL procedure successfully completed.
 SELECT * FROM salary; 
 
 SELECT * FROM increment_salary; 
-
+SELECT * FROM salary; 
 
 Problem statement 8. 
 Q 1.Borrower(Roll_no, Name, DateofIssue, NameofBook, Status) 
@@ -479,10 +490,10 @@ mamt := (days - 15) * 5;
 INSERT INTO fine VALUES (mroll_no, dor, mamt); 
 END IF; 
 END; 
-SQL> BEGIN 
-2 process_borrower_fine(&mroll_no); 
-3 END; 
-4 / 
+BEGIN 
+ process_borrower_fine(&mroll_no); 
+ END; 
+ / 
 
 select * from fine; 
 
