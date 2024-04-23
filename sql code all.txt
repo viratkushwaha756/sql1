@@ -564,7 +564,7 @@ SELECT * FROM stud;
 
 DECLARE 
 CURSOR check_status IS SELECT roll,att FROM stud WHERE att < 75 ; 
-mroll_no stud.roll_no%type; 
+mroll_no stud.roll%type; 
 matt stud.att%type; 
 BEGIN 
 OPEN check_status; 
@@ -573,7 +573,7 @@ LOOP
 FETCH check_status INTO mroll_no,matt; 
 exit WHEN check_status%notfound; 
 IF check_status%found THEN 
-UPDATE stud SET status = 'D' WHERE roll_no = mroll_no; 
+UPDATE stud SET status = 'D' WHERE roll = mroll_no; 
 INSERT INTO d_stud VALUES(mroll_no,matt); 
 END IF; 
 END LOOP; 
