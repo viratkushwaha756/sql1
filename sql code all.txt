@@ -670,6 +670,15 @@ records
 that ARE BEING updated or deleted. The old value of updated or deleted records should be 
 added 
 in audit_trade table. (separate implementation using both row and statement triggers) 
+/*
+CREATE TABLE clientmstr ( 
+client_id NUMBER PRIMARY KEY, 
+client_name VARCHAR2(50), 
+client_address VARCHAR2(100), 
+client_phone VARCHAR2(20) 
+); 
+*/
+
 CREATE OR REPLACE TRIGGER trade_record 
 AFTER INSERT OR DELETE 
 ON client 
