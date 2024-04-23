@@ -563,7 +563,7 @@ SELECT * FROM stud;
 
 
 DECLARE 
-CURSOR check_status IS SELECT roll_no,att FROM stud WHERE att < 75 ; 
+CURSOR check_status IS SELECT roll,att FROM stud WHERE att < 75 ; 
 mroll_no stud.roll_no%type; 
 matt stud.att%type; 
 BEGIN 
