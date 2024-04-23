@@ -321,25 +321,40 @@ in stud
 table as “ND”. 
 CREATE TABLE stud(roll_no NUMBER PRIMARY KEY , att NUMBER ,status char(5)); 
 
-Declare 
-mroll number(10); 
-matt number(10); 
-Begin 
-mroll:=&mroll; 
-select att into matt from stud where roll_no = mroll; 
-if matt<75 then 
-dbms_output.put_line(mroll || 'is detained'); 
-update stud set status='D' where roll_no = mroll; 
-else 
-dbms_output.put_line(mroll || 'is not detained'); 
-update stud set status='ND' where roll_no = mroll; 
-end if; 
-Exception 
-when no_data_found then 
-dbms_output.put_line(mroll || 'Not found'); 
-End; 
-/ 
+set serveroutput on 
+ 
+ DECLARE   
+       v_roll NUMBER;   
+        v_attendance NUMBER;   
+        v_status VARCHAR(5);   
+    BEGIN   
+           v_roll := &roll;   
+     
+          SELECT Att, Status INTO v_attendance, v_status   
+        FROM Stud   
+       WHERE Roll = v_roll;   
+    
+          IF v_attendance < 75 THEN   
+          DBMS_OUTPUT.PUT_LINE('Term not granted');   
+          UPDATE Stud   
+          SET Status = 'D'   
+         WHERE Roll = v_roll;   
+       ELSE   
+          DBMS_OUTPUT.PUT_LINE('Term granted');   
+            UPDATE Stud   
+          SET Status = 'ND'   
+          WHERE Roll = v_roll;   
+      END IF;   
+    
+   EXCEPTION   
+       WHEN NO_DATA_FOUND THEN   
+           DBMS_OUTPUT.PUT_LINE('Roll number not found');   
+       WHEN OTHERS THEN   
+           DBMS_OUTPUT.PUT_LINE('An error occurred');   
+   END;   
+   /  
 select * from stud; 
+
 
 
 Q 2.The bank manager has decided to activate all those accounts which were previously 
