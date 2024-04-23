@@ -364,23 +364,23 @@ cursor)
 to update the status of account, display an approximate message based on the no. of rows 
 affected 
 by the update. (Use of %FOUND, %NOTFOUND, %ROWCOUNT) 
+
+DECLARE    
+UCount NUMBER;    
+NUCount NUMBER;    
+BEGIN    
+UPDATE Acc_Det_B113 SET Status = 'Active' WHERE (SYSDATE - L_T_Date ) > 365;   
+IF (SQL%FOUND) THEN    UCount := SQL%ROWCOUNT;    
+DBMS_OUTPUT.PUT_LINE(UCount || ' Accounts updated');    
+ELSIF (SQL%NOTFOUND) THEN    
+NUCount := SQL%ROWCOUNT;    
+DBMS_OUTPUT.PUT_LINE(NUCount || ' Accounts not updated');    
+END IF;    
+END;    
+/  
+
 SELECT * FROM account; 
 
-
-BEGIN 
-UPDATE account SET status = 'active' WHERE status = 'inactive'; 
-dbms_output.put_line(SQL%ROWCOUNT||' no of account updated'); 
-END; 
-/ 
-2 no of account updated 
-PL/SQL procedure successfully completed. 
-SELECT * FROM account; 
-
-BEGIN 
-UPDATE account SET status = 'active' WHERE status = 'inactive'; 
-dbms_output.put_line(SQL%ROWCOUNT||' no of account updated'); 
-END; 
-/ 
 
 Problem statement 7. 
 Q 1. Write an SQL code block these raise a user defined exception where business rule is 
