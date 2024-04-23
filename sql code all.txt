@@ -852,7 +852,18 @@ Rs.
 Action should be rejection of update or Insert operation by displaying appropriate error 
 message. 
 Also the new values expected to be inserted will be stored in new table. 
-Tracking(e_no, salary). 
+Tracking(e_no, salary).
+
+CREATE TABLE employee (
+    emp_id NUMBER GENERATED ALWAYS AS IDENTITY,
+    emp_date TIMESTAMP WITH TIME ZONE DEFAULT SYSTIMESTAMP,
+    employee_number NUMBER,
+    action_type VARCHAR2(10), -- 'INSERT' or 'UPDATE'
+    comments VARCHAR2(255),
+    salary NUMBER
+);
+
+
 SELECT * FROM employee; 
 no rows selected 
 
